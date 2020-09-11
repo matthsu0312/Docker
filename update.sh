@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /tmp
-wget https://raw.githubusercontent.com/chauncey5566/docker-compose.yaml/master/docker-compose.yaml
+wget https://raw.githubusercontent.com/matthsu0312/Docker/master/docker-compose.yaml
 mv -f /tmp/docker-compose.yaml /php-nginx-compose/docker-compose.yaml
 /bin/cp -f /php-nginx-compose/docker-compose.yaml /root/docker-compose.yaml
 rm -f /tmp/docker-compose.yaml
