@@ -1,0 +1,21 @@
+FROM php:5.6-fpm
+
+RUN touch /usr/local/etc/php/php.ini \
+&& echo "date.timezone = "Asia/Taipei"" >> /usr/local/etc/php/php.ini
+
+RUN apt-get update \
+&& apt-get install -y libxpm-dev libwebp-dev libfreetype6-dev libjpeg62-turbo-dev libmcrypt-dev libpng-dev vim wget libxml2 libxml2-dev libmemcached-dev zlib1g-dev
+
+RUN pecl install memcached-2.2.0 \
+&& docker-php-ext-enable memcached
+
+RUN docker-php-ext-install pdo_mysql \
+&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+&& docker-php-ext-install gd \
+&& docker-php-ext-install mcrypt \
+&& docker-php-ext-install soap
+
+RUN cd /usr/local/lib/php/extensions/no-debug-non-zts-20131226 \
+&& wget 61.31.226.218/~taco/zendloader56/ZendGuardLoader.so \
+&& touch /usr/local/etc/php/conf.d/ZendGuardLoader.ini \
+&& echo "extension=ZendGuardLoader.so" >> /usr/local/etc/php/conf.d/ZendGuardLoader.ini

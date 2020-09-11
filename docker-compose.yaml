@@ -1,0 +1,133 @@
+version: '2'
+
+services:
+
+#####nginx
+ nginx:
+  image: "nginx:1.14"
+
+  volumes:
+   - "$PWD/conf.d:/etc/nginx/conf.d"
+   - "$PWD/html:/usr/share/nginx/html"
+
+  ports:
+   - "80:80"
+   - "81:81"
+
+  links:
+   - php5.6
+   - php5.3
+  
+  restart: always
+  
+  networks:
+     docker_net:
+        ipv4_address: 172.87.0.87
+
+  container_name: "compose-nginx"
+
+#####php5.6
+ php5.6:
+  image: "chauncey5566/dockercomposephp5.6"
+
+  links:
+   - "mysql"
+
+  volumes:
+   - "$PWD/html:/var/www/html"
+   - "/etc/localtime:/etc/localtime"
+   - "$PWD/php.ini:/usr/local/etc/php/php.ini"
+
+  container_name: "compose-php5.6"
+
+  links:
+   - "mysql"
+
+  expose:
+   - "9000"
+
+  restart: always
+
+  networks:
+     docker_net:
+        ipv4_address: 172.87.0.56
+
+#####php5.3
+ php5.3:
+  image: "chauncey5566/dockercomposephp5.3"
+
+  links:
+   - "mysql"
+
+  volumes:
+   - "$PWD/html:/var/www/html"
+   - "/etc/localtime:/etc/localtime"
+   - "$PWD/php.ini:/usr/local/etc/php/php.ini"
+
+  container_name: "compose-php5.3"
+
+  links:
+   - "mysql"
+
+  expose:
+   - "9000"
+
+  restart: always
+
+  networks:
+     docker_net:
+        ipv4_address: 172.87.0.53
+
+#####mysql
+ mysql:
+  image: "mysql:5.6"
+
+  volumes:
+   - "/php-nginx-compose/mysql:/var/lib/mysql/"
+   - "$PWD/my.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf"
+
+  container_name: "compose-mysql"
+
+  ports:
+   - "3306:3306"
+
+  environment:
+   MYSQL_ROOT_PASSWORD : 4rfv3edc
+
+  restart: always
+
+  networks:
+     docker_net:
+        ipv4_address: 172.87.0.33
+
+#####phpmyadmin
+ phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+
+  links:
+   - "mysql"
+
+  ports:
+   - "888:80"
+
+  restart: always
+
+  environment:
+   MYSQL_USER: root
+   MYSQL_PASSWORD: 4rfv3edc
+   MYSQL_ROOT_PASSWORD: 4rfv3edc
+   PMA_HOST: mysql
+
+  networks:
+     docker_net:
+        ipv4_address: 172.87.0.101
+
+#####network
+networks:
+  docker_net:
+   driver: bridge
+   ipam:
+    driver: default
+    config:
+    - subnet: 172.87.0.0/16
+      gateway: 172.87.0.1
